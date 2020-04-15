@@ -1,5 +1,10 @@
 module.exports = {
-  plugins: {
-    autoprefixer: {}
+  configureWebpack: {
+    resolve: {
+      alias: {
+        'assets': '@/assets',
+        'components': '@/components'
+      }
+    }
   }
 }
