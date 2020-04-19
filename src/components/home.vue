@@ -1,23 +1,22 @@
 <template>
   <div class="container">
-    <Header></Header>
-    <Calendar :week="week" :month="month"></Calendar>
+    <CalendarHeader></CalendarHeader>
+    <Calendar :week="week"></Calendar>
   </div>
 </template>
 
 <script>
-import Header from './childComponents/header'
+import CalendarHeader from './childComponents/calendarheader'
 import Calendar from './childComponents/calendar'
 export default {
   name: 'home',
   data () {
     return {
-      week: ['日', '一', '二', '三', '四', '五', '六'],
-      month: [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+      week: ['日', '一', '二', '三', '四', '五', '六']
     }
   },
   components: {
-    Header,
+    CalendarHeader,
     Calendar
   }
 }
