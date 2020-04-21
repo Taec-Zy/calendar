@@ -34,8 +34,13 @@ export default {
       return ('00' + str).substr(str.length) // 用0补齐位数
     }
   },
-  created () {
-    this.Bus.$on('calendarDayClick', (mon, day, year) => {
+  mounted () {
+    this.Bus.$on('calendarDayClick2', (mon, day, year) => {
+      this.year = year
+      this.month = this.padLeftZero(mon + 1)
+      this.day = this.padLeftZero(day)
+    })
+    this.Bus.$on('calendarDayInit2', (mon, day, year) => {
       this.year = year
       this.month = this.padLeftZero(mon + 1)
       this.day = this.padLeftZero(day)

@@ -36,7 +36,7 @@ export default {
       // swiper配置
       swiperOptions: {
         autoHeight: true,
-        touchRatio: 0.5,
+        touchRatio: 0.8,
         // loop: true,
         on: {
           slideChange: () => {
@@ -44,7 +44,10 @@ export default {
               let index = this.$refs.mySwiper.$swiper.activeIndex
               this.s(index)
               this.$refs.swiperitem[index].$children[0].initDay()
-            }, 300)
+            }, 100)
+          },
+          transitionEnd: () => {
+            this.Bus.$emit('slideChange')
           }
         }
       }
@@ -74,6 +77,11 @@ export default {
       console.log(index, this.currentMonth)
     }
   },
+  computed: {
+    showCalender: () => {
+      return this.currentType[this.cIndex]
+    }
+  },
   created () {
     this.getdays()
   },
@@ -86,6 +94,7 @@ export default {
 <style lang="stylus" scoped>
 .calendar
   border-bottom 1px solid #e4e4e4
+  background-color #fff
   .weeks
     display flex
     justify-content space-between
