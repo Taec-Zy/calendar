@@ -79,7 +79,6 @@ export default {
       // 我们这里会判断scroll实例是否创建了
     },
     refresh () {
-      console.log('--------')
       this.scroll && this.scroll.refresh()
     },
     finishPullUp () {

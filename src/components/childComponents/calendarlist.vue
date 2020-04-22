@@ -1,8 +1,8 @@
 <template>
 <div ref="calendarlist">
-  <Scorll ref="scroll">
+  <Scorll ref="scroll" :style="{height: cheight}">
     <div class="list">
-     <div class="nocalender" v-show="!currentList.length">
+     <div class="nocalender" v-show="!currentList.length" :style="{height: cheight, lineHeight: cheight}">
         今天没有此项日程
      </div>
      <div class="listitem" v-for="(item, index) in currentList" :key="index">
@@ -36,9 +36,9 @@ export default {
       // 处理当前时间
       currentTime: '',
       // 当前需要展示的数组
-      currentList: []
+      currentList: [],
       // 当前列表栏的高度
-      // height: ''
+      cheight: '0px'
     }
   },
   methods: {
@@ -49,10 +49,6 @@ export default {
     padLeftZero (str) {
       str = str + ''
       return ('00' + str).substr(str.length) // 用0补齐位数
-    },
-    // 获取滚动区域高度
-    getHeight () {
-      console.log(this.$refs.calendarlist.offsetTop)
     }
   },
   created () {
@@ -85,9 +81,15 @@ export default {
       this.currentList = res.data.matters
       this.$refs.scroll.refresh()
     })
-    console.log(640 - this.$refs.calendarlist.offsetTop)
     this.Bus.$on('slideChange', () => {
-      console.log(this.$refs.scroll.$el.style)
+      let h = 640 - this.$refs.scroll.$el.offsetTop + 'px'
+      console.log(h)
+      this.cheight = h
+      getDayMatters(this.currentTime, this.type[this.currentType]).then(res => {
+        this.currentList = res.data.matters
+        this.$refs.scroll.refresh()
+        this.$refs.scroll.scrollTo(0, 0)
+      })
     })
   }
 }
@@ -95,7 +97,6 @@ export default {
 
 <style lang='stylus' scoped>
 .wrapper
-  height 190px
   width 100%vw
   overflow hidden
   .list
@@ -103,10 +104,8 @@ export default {
     background-color #fff
     .nocalender
       text-align center
-      height 190px
       width 100%vw
       font-size 25px
-      line-height 190px
       color #f2f2f2
     .listitem
       position relative

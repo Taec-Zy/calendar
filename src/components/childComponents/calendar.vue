@@ -5,7 +5,7 @@
      </ul>
      <swiper ref="mySwiper" :options="swiperOptions">
        <swiper-slide v-for="index in 12" :key="index" ref="swiperitem">
-           <CalendarPage :currentYear="currentYear" :currentMonth="currentMonth" :month="index - 1" :currentDay="currentDay"></CalendarPage>
+           <CalendarPage :currentMonth="currentMonth" :month="index - 1" :currentDay="currentDay"></CalendarPage>
        </swiper-slide>
      </swiper>
      <div class="arrow">
@@ -37,17 +37,33 @@ export default {
       swiperOptions: {
         autoHeight: true,
         touchRatio: 0.8,
-        // loop: true,
         on: {
           slideChange: () => {
-            setTimeout(() => {
+            this.$nextTick(() => {
               let index = this.$refs.mySwiper.$swiper.activeIndex
+              this.$refs.mySwiper.$swiper.updateAutoHeight(900)
               this.s(index)
               this.$refs.swiperitem[index].$children[0].initDay()
-            }, 100)
+            })
           },
           transitionEnd: () => {
-            this.Bus.$emit('slideChange')
+            this.$nextTick(() => {
+              this.Bus.$emit('slideChange')
+            })
+          },
+          touchEnd: () => {
+            let Tr = this.$refs.mySwiper.$swiper.translate
+            console.log(Tr)
+            if (Tr < -3700) {
+              this.currentYear = this.currentYear + 1
+              this.$refs.mySwiper.$swiper.slideTo(0, 0)
+              this.Bus.$emit('addYear')
+            }
+            if (Tr > 60) {
+              this.currentYear = this.currentYear - 1
+              this.$refs.mySwiper.$swiper.slideTo(11, 0)
+              this.Bus.$emit('subYear')
+            }
           }
         }
       }
