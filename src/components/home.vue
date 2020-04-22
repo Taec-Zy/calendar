@@ -29,4 +29,6 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
+.container
+  height 100%vh
 </style>

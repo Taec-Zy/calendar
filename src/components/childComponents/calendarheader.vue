@@ -27,7 +27,7 @@ export default {
   },
   methods: {
     todayClick () {
-      console.log('today')
+      this.Bus.$emit('backToday')
     },
     padLeftZero (str) {
       str = str + ''

@@ -188,6 +188,11 @@ export default {
     this.currentMonthPage()
     this.getTimeRange()
     this.getAllCalendar()
+    this.Bus.$on('backToday', () => {
+      console.log('日历页监听')
+      let date = new Date()
+      this.currentYear = date.getFullYear()
+    })
   }
 }
 </script>

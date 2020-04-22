@@ -74,13 +74,7 @@ export default {
         this.$refs.scroll.scrollTo(0, 0)
       })
     })
-  },
-  mounted () {
-    // 获取初始化的数据
-    getDayMatters(this.currentTime, this.type[this.currentType]).then(res => {
-      this.currentList = res.data.matters
-      this.$refs.scroll.refresh()
-    })
+    // 监听日历页切换事件
     this.Bus.$on('slideChange', () => {
       let h = 640 - this.$refs.scroll.$el.offsetTop + 'px'
       console.log(h)
@@ -90,6 +84,13 @@ export default {
         this.$refs.scroll.refresh()
         this.$refs.scroll.scrollTo(0, 0)
       })
+    })
+  },
+  mounted () {
+    // 获取初始化的数据
+    getDayMatters(this.currentTime, this.type[this.currentType]).then(res => {
+      this.currentList = res.data.matters
+      this.$refs.scroll.refresh()
     })
   }
 }

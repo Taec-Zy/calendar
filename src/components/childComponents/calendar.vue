@@ -41,8 +41,7 @@ export default {
           slideChange: () => {
             this.$nextTick(() => {
               let index = this.$refs.mySwiper.$swiper.activeIndex
-              this.$refs.mySwiper.$swiper.updateAutoHeight(900)
-              this.s(index)
+              this.$refs.mySwiper.$swiper.updateAutoHeight(100)
               this.$refs.swiperitem[index].$children[0].initDay()
             })
           },
@@ -54,12 +53,12 @@ export default {
           touchEnd: () => {
             let Tr = this.$refs.mySwiper.$swiper.translate
             console.log(Tr)
-            if (Tr < -3700) {
+            if (Tr < -4000) {
               this.currentYear = this.currentYear + 1
               this.$refs.mySwiper.$swiper.slideTo(0, 0)
               this.Bus.$emit('addYear')
             }
-            if (Tr > 60) {
+            if (Tr > 90) {
               this.currentYear = this.currentYear - 1
               this.$refs.mySwiper.$swiper.slideTo(11, 0)
               this.Bus.$emit('subYear')
@@ -88,9 +87,6 @@ export default {
     arrowClick () {
       this.arrowRotate = !this.arrowRotate
       console.log(this.arrowRotate)
-    },
-    s (index) {
-      console.log(index, this.currentMonth)
     }
   },
   computed: {
@@ -103,6 +99,10 @@ export default {
   },
   mounted () {
     this.$refs.mySwiper.$swiper.slideTo(this.currentMonth, 0)
+    // 监听回到今天的点击
+    this.Bus.$on('backToday', () => {
+      this.$refs.mySwiper.$swiper.slideTo(this.currentMonth, 500)
+    })
   }
 }
 </script>
