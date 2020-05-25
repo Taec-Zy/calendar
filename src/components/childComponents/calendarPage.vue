@@ -22,7 +22,8 @@ export default {
   data () {
     return {
       // 当前日历年份
-      currentYear: 0,
+      monthPageYear: 0,
+      monthPageMonth: 0,
       // 当前页日历表
       calendarDateArr: [],
       // 当前点击了日期
@@ -41,14 +42,44 @@ export default {
     }
   },
   props: {
-    currentMonth: {
-      type: Number
-    },
-    currentDay: {
-      type: Number
-    },
+    // 当前页对应的月份数，由v-for循环得出
     month: {
       type: Number
+    },
+    // 记录日历切换时候对应的年份
+    currentSelectYear: {
+      type: Number
+    },
+    // 记录日历切换时候对应的月份
+    currentSelectMonth: {
+      type: Number
+    },
+    // 记录日历切换时候对应的日期
+    currentSelectDay: {
+      type: Number
+    },
+    // 对应当前切换箭头
+    arrowRotate: {
+      type: Boolean
+    }
+  },
+  watch: {
+    currentSelectDay (val) {
+      this.selectDay = val
+    },
+    currentSelectMonth (val) {
+      this.monthPageMonth = val
+    },
+    currentSelectYear (val) {
+      this.monthPageYear = val
+    },
+    arrowRotate (val) { // 监听展开箭头切换
+      if (val) {
+        console.log(`月历列表展开了了${val}`)
+        this.currentMonthPage()
+        this.getTimeRange()
+        this.getAllCalendar()
+      }
     }
   },
   methods: {
@@ -58,15 +89,14 @@ export default {
       // 采用42/35显示标注
       let monthDayNum
       const page = new Date()
-      page.setFullYear(this.currentYear, this.month, 1)
+      page.setFullYear(this.monthPageYear, this.month, 1)
       // 获取当前月的第一天
       let weekStarDay = page.getTime()
       // 获取当前页第一天是周几
       let weekDay = page.getDay()
-      console.log(this.month + 1, weekDay)
       // 当前月第一天是周几就要往前面添加几天 往前添加每天的毫秒数
       let startTime = weekStarDay - weekDay * 24 * 60 * 60 * 1000
-      if (weekDay === 6 || weekDay === 7) {
+      if (weekDay === 6 || weekDay === 5) {
         // 如果第一天是周六/周日，那么就按7周来显示，如果不是就按照5周显示
         monthDayNum = 42
       } else {
@@ -92,23 +122,17 @@ export default {
       if (date.getMonth() === this.month) {
         this.selectDay = date.getDate()
       }
-      // 向总线发送事件 传递选中的日期
-      this.Bus.$emit('calendarDayClick', this.month + 1, this.selectDay, this.currentYear)
-      this.Bus.$emit('calendarDayClick2', this.month, this.selectDay, this.currentYear)
-      // 当前日期/当前周的还有几天过完(不算今天) 向上取整就是当前月份的周数
+      this.$emit('MonthPageClick', this.selectDay, this.month)
     },
     isCurrentMonth (date) {
       return this.month === date.getMonth()
     },
     // 日期初始化
     initDay () {
-      if (this.currentMonth === this.month) {
-        this.selectDay = this.currentDay
-      } else {
-        this.selectDay = 1
+      if (this.currentSelectMonth === this.month) {
+        console.log('是当前月')
+        this.selectDay = this.currentSelectDay
       }
-      this.Bus.$emit('calendarDayInit', this.month + 1, this.selectDay, this.currentYear)
-      this.Bus.$emit('calendarDayInit2', this.month, this.selectDay, this.currentYear)
     },
     // 获取起始和结束时间
     getTimeRange () {
@@ -147,16 +171,18 @@ export default {
   },
   mounted () {
     this.initDay()
+    this.monthPageMonth = this.currentSelectMonth
+    this.monthPageYear = this.currentSelectYear
     this.Bus.$on('addYear', () => {
       console.log('add')
-      this.currentYear = this.currentYear + 1
+      this.monthPageYear = this.monthPageYear + 1
       this.currentMonthPage()
       this.getTimeRange()
       this.getAllCalendar()
     })
     this.Bus.$on('subYear', () => {
       console.log('sub')
-      this.currentYear = this.currentYear - 1
+      this.monthPageYear = this.monthPageYear - 1
       this.currentMonthPage()
       this.getTimeRange()
       this.getAllCalendar()
@@ -166,7 +192,7 @@ export default {
     isActive (date) {
       return function (date) {
         let active = false
-        if (this.currentMonth === date.getMonth() && this.month === date.getMonth()) {
+        if (this.monthPageMonth === date.getMonth() && this.month === date.getMonth()) {
           active = this.selectDay === date.getDate()
         } else if (this.month === date.getMonth() && this.month === date.getMonth()) {
           active = this.selectDay === date.getDate()
@@ -189,7 +215,6 @@ export default {
     this.getTimeRange()
     this.getAllCalendar()
     this.Bus.$on('backToday', () => {
-      console.log('日历页监听')
       let date = new Date()
       this.currentYear = date.getFullYear()
     })

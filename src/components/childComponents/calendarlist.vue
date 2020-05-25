@@ -32,7 +32,7 @@ export default {
       // Type的中文数组
       type: ['提醒', '创建', '最后'],
       // 当前的选中的类型
-      currentType: 0,
+      currentType: '0',
       // 处理当前时间
       currentTime: '',
       // 当前需要展示的数组
@@ -41,29 +41,38 @@ export default {
       cheight: '0px'
     }
   },
-  methods: {
-    getDay (month, day, year) {
-      this.currentTime = `${year}-${this.padLeftZero(month)}-${this.padLeftZero(day)}`
-    },
-    // 给日期补0
-    padLeftZero (str) {
-      str = str + ''
-      return ('00' + str).substr(str.length) // 用0补齐位数
-    }
-  },
-  created () {
-    // 通过总线监听每个日历页的初始化
-    this.Bus.$on('calendarDayInit', (month, day, year) => {
-      this.getDay(month, day, year)
-    })
-    // 通过总线监听每个日历页的日期点击事件
-    this.Bus.$on('calendarDayClick', (month, day, year) => {
-      this.getDay(month, day, year)
+  watch: {
+    currentTime (newval, oldval) {
       getDayMatters(this.currentTime, this.type[this.currentType]).then(res => {
         this.currentList = res.data.matters
         this.$refs.scroll.refresh()
         this.$refs.scroll.scrollTo(0, 0)
       })
+    }
+  },
+  methods: {
+    // 给日期补0
+    padLeftZero (str) {
+      str = str + ''
+      return ('00' + str).substr(str.length) // 用0补齐位数
+    },
+    getHeight () {
+      let h = 640 - this.$refs.scroll.$el.offsetTop + 'px'
+      this.cheight = h
+    }
+  },
+  created () {
+    this.Bus.$on('getSelectDay', (cyear, cmonth, cday) => {
+      this.currentTime = `${cyear}-${this.padLeftZero(cmonth + 1)}-${this.padLeftZero(cday)}`
+      // 获取初始化的数据
+      getDayMatters(this.currentTime, this.type[this.currentType]).then(res => {
+        console.log('获取数据')
+        this.currentList = res.data.matters
+        this.$nextTick(() => {
+          this.$refs.scroll.refresh()
+        })
+      })
+      this.getHeight()
     })
     // 通过总线监听tabbar栏的点击
     this.Bus.$on('tabbarClick2', index => {
@@ -76,22 +85,30 @@ export default {
     })
     // 监听日历页切换事件
     this.Bus.$on('slideChange', () => {
-      let h = 640 - this.$refs.scroll.$el.offsetTop + 'px'
-      console.log(h)
-      this.cheight = h
       getDayMatters(this.currentTime, this.type[this.currentType]).then(res => {
         this.currentList = res.data.matters
         this.$refs.scroll.refresh()
         this.$refs.scroll.scrollTo(0, 0)
       })
+      this.$nextTick(() => {
+        this.getHeight()
+      })
+    })
+    // 监听折叠按钮点击事件
+    this.Bus.$on('arrowClick', () => {
+      console.log(`箭头点击`)
+      getDayMatters(this.currentTime, this.type[this.currentType]).then(res => {
+        this.currentList = res.data.matters
+        this.$refs.scroll.refresh()
+        this.$refs.scroll.scrollTo(0, 0)
+      })
+      setTimeout(() => {
+        this.getHeight()
+      }, 1200)
     })
   },
-  mounted () {
-    // 获取初始化的数据
-    getDayMatters(this.currentTime, this.type[this.currentType]).then(res => {
-      this.currentList = res.data.matters
-      this.$refs.scroll.refresh()
-    })
+  updated () {
+    this.getHeight()
   }
 }
 </script>
@@ -113,6 +130,8 @@ export default {
       padding 11px 16px
       height 74px
       border-bottom 1px solid #f2f2f2
+      &:last-child
+        border 0
       .info
         .title
           font-size 18px

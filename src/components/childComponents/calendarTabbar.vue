@@ -22,6 +22,7 @@ export default {
         this.currentIndex = index
       }
       this.Bus.$emit('tabbarClick1', this.type[this.currentIndex])
+      this.Bus.$emit('tabbarWeekClick', this.type[this.currentIndex])
       this.Bus.$emit('tabbarClick2', this.currentIndex)
     }
   },
@@ -48,14 +49,14 @@ export default {
   background-color #f5f5f5
   z-index 2
   overflow hidden
-  &:before
-    content ''
-    width 20px
-    height 20px
-    background-color #2a579a
-    transform rotate(45deg)
-    position absolute
-    top 43px
+  // &:before
+  //   content ''
+  //   width 20px
+  //   height 20px
+  //   background-color #2a579a
+  //   transform rotate(45deg)
+  //   position absolute
+  //   top 43px
   &:after
     background-color: #ffffff
     content ''
